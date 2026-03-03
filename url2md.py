@@ -6,10 +6,18 @@ from bs4 import BeautifulSoup, NavigableString, Tag, Comment
 
 async def get_html(url):
     async with async_playwright() as p:
+        # Note: Set headless=False if running locally to see the browser window
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
-        # Set a timeout and wait for network idle to ensure dynamic content is loaded
-        await page.goto(url, wait_until="networkidle", timeout=60000)
+        # Set a timeout and wait for DOM content to ensure basic structure is there
+        print(f"Navigating to {url}...")
+        try:
+            await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            # Wait a few seconds for dynamic content to render
+            await asyncio.sleep(5)
+        except Exception as e:
+            print(f"Warning during navigation: {e}")
+            
         content = await page.content()
         await browser.close()
         return content
