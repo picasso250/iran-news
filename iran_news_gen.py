@@ -107,7 +107,7 @@ def convert_md_to_html(md_path):
 
 def main():
     md_file = 'iran-news-zh.md'
-    output_file = 'iran-news-zh.html'
+    output_file = 'index.html'
     
     content_html = convert_md_to_html(md_file)
     
