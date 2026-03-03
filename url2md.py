@@ -2,7 +2,7 @@ import argparse
 import asyncio
 import re
 from playwright.async_api import async_playwright
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup, NavigableString, Tag, Comment
 
 async def get_html(url):
     async with async_playwright() as p:
@@ -15,11 +15,14 @@ async def get_html(url):
         return content
 
 def convert_to_md(soup):
-    # Remove script and style elements as they don't contain user-visible text
-    for script_or_style in soup(["script", "style"]):
-        script_or_style.decompose()
+    # Remove script, style, and other non-content elements
+    for element in soup(["script", "style", "noscript", "iframe", "svg", "canvas", "template"]):
+        element.decompose()
 
     def walk(element):
+        if isinstance(element, Comment):
+            return ""
+            
         if isinstance(element, NavigableString):
             return element.strip()
 
