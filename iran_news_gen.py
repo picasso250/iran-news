@@ -3,8 +3,10 @@ import csv
 from bs4 import BeautifulSoup
 import os
 import re
+from datetime import datetime, timezone, timedelta
 
 def generate_timeline_html(tsv_path):
+    # ... (existing code remains same)
     timeline_items = []
     if not os.path.exists(tsv_path):
         return f"<!-- File not found: {tsv_path} -->"
@@ -111,12 +113,19 @@ def main():
     
     content_html = convert_md_to_html(md_file)
     
+    # Get current UTC time and Beijing time (UTC+8)
+    utc_now = datetime.now(timezone.utc)
+    beijing_now = utc_now + timedelta(hours=8)
+    
+    date_str = beijing_now.strftime('%Y年%m月%d日')
+    update_time_str = beijing_now.strftime('%Y年%m月%d日 %H:%M')
+
     template = f"""<!DOCTYPE html>
 <html lang="zh-CN">
  <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>伊朗最新新闻汇总 - 2026年3月1日</title>
+  <title>伊朗最新新闻汇总 - {date_str}</title>
   <style>
    :root {{
             --primary-color: #e63946;
@@ -310,10 +319,10 @@ def main():
   <div class="container">
    <header>
     <h1>伊朗最新新闻汇总</h1>
-    <p class="update-time">最后更新：2026年3月1日 11:35 (北京时间)</p>
+    <p class="update-time">最后更新：{update_time_str} (北京时间)</p>
    </header>
    <div class="breaking-banner">
-    实时更新：伊朗国家电视台正式确认哈梅内伊在美以空袭中身亡，伊朗成立权力过渡委员会
+    实时更新：美军确认首批阵亡士兵身份；德黑兰平民死亡人数正式过千。
    </div>
    <div class="content-body">
     {content_html}
